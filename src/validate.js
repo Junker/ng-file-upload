@@ -118,11 +118,12 @@ ngFileUpload.service('UploadValidate', ['UploadDataUrl', '$q', '$timeout', funct
   // Reference:
   // https://github.com/sindresorhus/file-type
   function _validateFileType(acceptPattern, file) {
+    var d = $q.defer();
     if (!acceptPattern) {
-      return true;
+      d.resolve(true);
+      return d.promise;
     }
 
-    var d = $q.defer();
     var filereader = new FileReader();
 
     filereader.onloadend = function(evt) {
