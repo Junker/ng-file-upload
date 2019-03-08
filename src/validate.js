@@ -314,18 +314,18 @@ ngFileUpload.service('UploadValidate', ['UploadDataUrl', '$q', '$timeout', funct
     var promises = [];
 
     if (files) {
-      var acceptPattern = attr.accept || null;
-      var i = files.length, valid = null;
+      var ftAcceptPattern = attr.accept || null;
+      var fti = files.length;
 
-      while (i--) {
-        var file = files[i];
+      while (fti--) {
+        var ftFile = files[fti];
         promises.push(function() {
           var d = $q.defer();
 
-          _validateFileType(acceptPattern, file).then(function(isValidFileType) {
+          _validateFileType(ftAcceptPattern, ftFile).then(function(isValidFileType) {
             if (!isValidFileType) {
-              invalidFiles.push(file);
-              files.splice(i, 1);
+              invalidFiles.push(ftFile);
+              files.splice(fti, 1);
               ngModel.$ngfValidations.push({name: name, valid: false});
             }
 

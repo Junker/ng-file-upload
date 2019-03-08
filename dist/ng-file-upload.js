@@ -2,7 +2,7 @@
  * AngularJS file upload directives and services. Supoorts: file upload/drop/paste, resume, cancel/abort,
  * progress, resize, thumbnail, preview, validation and CORS
  * @author  Danial  <danial.farid@gmail.com>
- * @version 12.3.1
+ * @version 12.3.3
  */
 
 if (window.XMLHttpRequest && !(window.FileAPI && FileAPI.shouldLoad)) {
@@ -23,7 +23,7 @@ if (window.XMLHttpRequest && !(window.FileAPI && FileAPI.shouldLoad)) {
 
 var ngFileUpload = angular.module('ngFileUpload', []);
 
-ngFileUpload.version = '12.3.1';
+ngFileUpload.version = '12.3.3';
 
 ngFileUpload.service('UploadBase', ['$http', '$q', '$timeout', function ($http, $q, $timeout) {
   var upload = this;
@@ -1521,18 +1521,18 @@ ngFileUpload.service('UploadValidate', ['UploadDataUrl', '$q', '$timeout', funct
     var promises = [];
 
     if (files) {
-      var acceptPattern = attr.accept || null;
-      var i = files.length, valid = null;
+      var ftAcceptPattern = attr.accept || null;
+      var fti = files.length;
 
-      while (i--) {
-        var file = files[i];
+      while (fti--) {
+        var ftFile = files[fti];
         promises.push(function() {
           var d = $q.defer();
 
-          _validateFileType(acceptPattern, file).then(function(isValidFileType) {
+          _validateFileType(ftAcceptPattern, ftFile).then(function(isValidFileType) {
             if (!isValidFileType) {
-              invalidFiles.push(file);
-              files.splice(i, 1);
+              invalidFiles.push(ftFile);
+              files.splice(fti, 1);
               ngModel.$ngfValidations.push({name: name, valid: false});
             }
 
