@@ -3,7 +3,7 @@
  * progress, resize, thumbnail, preview, validation and CORS
  * FileAPI Flash shim for old browsers not supporting FormData
  * @author  Danial  <danial.farid@gmail.com>
- * @version 12.3.3
+ * @version 12.3.4
  */
 
 (function () {
@@ -386,29 +386,29 @@ if (!window.FileReader) {
     this.onabort = this.onerror = this.onload = this.onloadstart = this.onloadend = this.onprogress = null;
 
     var constructEvent = function (type, evt) {
-      var e = {type: type, target: _this, loaded: evt.loaded, total: evt.total, error: evt.error};
-      if (evt.result != null) e.target.result = evt.result;
-      return e;
+      var customEvt = {type: type, target: _this, loaded: evt.loaded, total: evt.total, error: evt.error};
+      if (evt.result != null) customEvt.target.result = evt.result;
+      return customEvt;
     };
     var listener = function (evt) {
       if (!loadStarted) {
         loadStarted = true;
         if (_this.onloadstart) _this.onloadstart(constructEvent('loadstart', evt));
       }
-      var e;
+      var fre;
       if (evt.type === 'load') {
         if (_this.onloadend) _this.onloadend(constructEvent('loadend', evt));
-        e = constructEvent('load', evt);
-        if (_this.onload) _this.onload(e);
-        _this.dispatchEvent(e);
+        fre = constructEvent('load', evt);
+        if (_this.onload) _this.onload(fre);
+        _this.dispatchEvent(fre);
       } else if (evt.type === 'progress') {
-        e = constructEvent('progress', evt);
-        if (_this.onprogress) _this.onprogress(e);
-        _this.dispatchEvent(e);
+        fre = constructEvent('progress', evt);
+        if (_this.onprogress) _this.onprogress(fre);
+        _this.dispatchEvent(fre);
       } else {
-        e = constructEvent('error', evt);
-        if (_this.onerror) _this.onerror(e);
-        _this.dispatchEvent(e);
+        fre = constructEvent('error', evt);
+        if (_this.onerror) _this.onerror(fre);
+        _this.dispatchEvent(fre);
       }
     };
     this.readAsDataURL = function (file) {
