@@ -20,29 +20,29 @@ if (!window.FileReader) {
     this.onabort = this.onerror = this.onload = this.onloadstart = this.onloadend = this.onprogress = null;
 
     var constructEvent = function (type, evt) {
-      var customEvt = {type: type, target: _this, loaded: evt.loaded, total: evt.total, error: evt.error};
-      if (evt.result != null) customEvt.target.result = evt.result;
-      return customEvt;
+      var e = {type: type, target: _this, loaded: evt.loaded, total: evt.total, error: evt.error};
+      if (evt.result != null) e.target.result = evt.result;
+      return e;
     };
     var listener = function (evt) {
       if (!loadStarted) {
         loadStarted = true;
         if (_this.onloadstart) _this.onloadstart(constructEvent('loadstart', evt));
       }
-      var fre;
+      var e;
       if (evt.type === 'load') {
         if (_this.onloadend) _this.onloadend(constructEvent('loadend', evt));
-        fre = constructEvent('load', evt);
-        if (_this.onload) _this.onload(fre);
-        _this.dispatchEvent(fre);
+        e = constructEvent('load', evt);
+        if (_this.onload) _this.onload(e);
+        _this.dispatchEvent(e);
       } else if (evt.type === 'progress') {
-        fre = constructEvent('progress', evt);
-        if (_this.onprogress) _this.onprogress(fre);
-        _this.dispatchEvent(fre);
+        e = constructEvent('progress', evt);
+        if (_this.onprogress) _this.onprogress(e);
+        _this.dispatchEvent(e);
       } else {
-        fre = constructEvent('error', evt);
-        if (_this.onerror) _this.onerror(fre);
-        _this.dispatchEvent(fre);
+        e = constructEvent('error', evt);
+        if (_this.onerror) _this.onerror(e);
+        _this.dispatchEvent(e);
       }
     };
     this.readAsDataURL = function (file) {
