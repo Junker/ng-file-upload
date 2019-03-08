@@ -1351,7 +1351,7 @@ ngFileUpload.service('UploadValidate', ['UploadDataUrl', '$q', '$timeout', funct
     return d.promise;
   }
 
-  upload.validate = async function (files, prevLength, ngModel, attr, scope) {
+  upload.validate = function (files, prevLength, ngModel, attr, scope) {
     ngModel = ngModel || {};
     ngModel.$ngfValidations = ngModel.$ngfValidations || [];
 
@@ -1373,23 +1373,12 @@ ngFileUpload.service('UploadValidate', ['UploadDataUrl', '$q', '$timeout', funct
     files = files.length === undefined ? [files] : files.slice(0);
     var invalidFiles = [];
 
-    async function validateSync(name, validationName, fn) {
+    function validateSync(name, validationName, fn) {
       if (files) {
-        var acceptPattern = attr.accept || null;
-
         var i = files.length, valid = null;
         while (i--) {
           var file = files[i];
           if (file) {
-
-            var isValidFileType = await _validateFileType(acceptPattern, file);
-            if (!isValidFileType) {
-              invalidFiles.push(file);
-              files.splice(i, 1);
-              ngModel.$ngfValidations.push({name: name, valid: false});
-              return;
-            }
-
             var val = upload.getValidationAttr(attr, scope, name, validationName, file);
             if (val != null) {
               if (!fn(file, val, i)) {
@@ -1417,15 +1406,15 @@ ngFileUpload.service('UploadValidate', ['UploadDataUrl', '$q', '$timeout', funct
       }
     }
 
-    await validateSync('pattern', null, upload.validatePattern);
-    await validateSync('minSize', 'size.min', function (file, val) {
+    validateSync('pattern', null, upload.validatePattern);
+    validateSync('minSize', 'size.min', function (file, val) {
       return file.size + 0.1 >= upload.translateScalars(val);
     });
-    await validateSync('maxSize', 'size.max', function (file, val) {
+    validateSync('maxSize', 'size.max', function (file, val) {
       return file.size - 0.1 <= upload.translateScalars(val);
     });
     var totalSize = 0;
-    await validateSync('maxTotalSize', null, function (file, val) {
+    validateSync('maxTotalSize', null, function (file, val) {
       totalSize += file.size;
       if (totalSize > upload.translateScalars(val)) {
         files.splice(0, files.length);
@@ -1434,7 +1423,7 @@ ngFileUpload.service('UploadValidate', ['UploadDataUrl', '$q', '$timeout', funct
       return true;
     });
 
-    await validateSync('validateFn', null, function (file, r) {
+    validateSync('validateFn', null, function (file, r) {
       return r === true || r === null || r === '';
     });
 
@@ -1530,6 +1519,30 @@ ngFileUpload.service('UploadValidate', ['UploadDataUrl', '$q', '$timeout', funct
 
     var deffer = $q.defer();
     var promises = [];
+
+    if (files) {
+      var acceptPattern = attr.accept || null;
+      var i = files.length, valid = null;
+
+      while (i--) {
+        var file = files[i];
+        promises.push(function() {
+          var d = $q.defer();
+
+          _validateFileType(acceptPattern, file).then(function(isValidFileType) {
+            if (!isValidFileType) {
+              invalidFiles.push(file);
+              files.splice(i, 1);
+              ngModel.$ngfValidations.push({name: name, valid: false});
+            }
+
+            d.resolve(isValidFileType);
+          });
+
+          return d.promise;
+        }());
+      }
+    }
 
     promises.push(validateAsync('maxHeight', 'height.max', /image/,
       this.imageDimensions, function (d, val) {
